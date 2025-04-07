@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Image Compression Tool</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    body {
+      margin: 0;
+      background: #f0f2f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .container {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      max-width: 800px;
+      width: 100%;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 1.5rem;
+    }
+    #drop-zone {
+      border: 2px dashed #007bff;
+      padding: 2rem;
+      text-align: center;
+      cursor: pointer;
+      border-radius: 10px;
+      background: #f9f9f9;
+      transition: background 0.3s ease;
+    }
+    #drop-zone:hover {
+      background: #e9f5ff;
+    }
+    .slider {
+      margin: 1.5rem 0;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .previews {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+    .preview {
+      flex: 1;
+      text-align: center;
+    }
+    .preview img {
+      max-width: 100%;
+      border-radius: 8px;
+      max-height: 300px;
+    }
+    .details {
+      text-align: center;
+      margin-top: 1rem;
+      font-size: 0.95rem;
+      color: #555;
+    }
+    button {
+      display: block;
+      margin: 1.5rem auto 0;
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Image Compression Tool</h1>
+    <div id="drop-zone">Click or drag an image here to upload</div>
+    <input type="file" id="file-input" accept="image/*" style="display:none;" />
+    <div class="slider">
+      <label for="quality">Quality:</label>
+      <input type="range" id="quality" min="10" max="100" value="80" />
+      <span id="quality-value">80</span>%
+    </div>
+    <div class="previews">
+      <div class="preview">
+        <h4>Original</h4>
+        <img id="original-preview" src="" alt="Original Image" />
+        <p class="details">Size: <span id="original-size">-</span></p>
+      </div>
+      <div class="preview">
+        <h4>Compressed</h4>
+        <img id="compressed-preview" src="" alt="Compressed Image" />
+        <p class="details">
+          Size: <span id="compressed-size">-</span><br>
+          Saved: <span id="compression-ratio">-</span>
+        </p>
+      </div>
+    </div>
+    <button id="download-button" disabled>Download Compressed Image</button>
+  </div>
+
+  <script>
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('file-input');
+    const qualityInput = document.getElementById('quality');
+    const qualityValue = document.getElementById('quality-value');
+    const originalPreview = document.getElementById('original-preview');
+    const compressedPreview = document.getElementById('compressed-preview');
+    const originalSizeEl = document.getElementById('original-size');
+    const compressedSizeEl = document.getElementById('compressed-size');
+    const compressionRatioEl = document.getElementById('compression-ratio');
+    const downloadButton = document.getElementById('download-button');
+
+    let originalImage = null;
+    let compressedBlob = null;
+
+    dropZone.addEventListener('click', () => fileInput.click());
+
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.style.backgroundColor = '#e9f5ff';
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+      dropZone.style.backgroundColor = '#f9f9f9';
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.style.backgroundColor = '#f9f9f9';
+      const file = e.dataTransfer.files[0];
+      handleImage(file);
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      handleImage(file);
+    });
+
+    qualityInput.addEventListener('input', () => {
+      qualityValue.textContent = qualityInput.value;
+      if (originalImage) {
+        compressAndPreview(originalImage);
+      }
+    });
+
+    downloadButton.addEventListener('click', () => {
+      if (compressedBlob) {
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(compressedBlob);
+        link.download = 'compressed.jpg';
+        link.click();
+      }
+    });
+
+    function handleImage(file) {
+      if (!file || !file.type.startsWith('image/')) {
+        alert('Please upload a valid image file');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const img = new Image();
+        img.onload = function () {
+          originalImage = img;
+          originalPreview.src = e.target.result;
+          compressAndPreview(img);
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function compressAndPreview(image) {
+      const canvas = document.createElement('canvas');
+      canvas.width = image.width;
+      canvas.height = image.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(image, 0, 0);
+
+      const quality = qualityInput.value / 100;
+      canvas.toBlob((blob) => {
+        compressedBlob = blob;
+        const compressedUrl = URL.createObjectURL(blob);
+        compressedPreview.src = compressedUrl;
+
+        downloadButton.disabled = false;
+
+        const originalSize = image.src.length * 0.75 / 1024; // estimate in KB
+        const compressedSize = blob.size / 1024;
+        const ratio = ((1 - compressedSize / originalSize) * 100).toFixed(2);
+
+        originalSizeEl.textContent = `${originalSize.toFixed(2)} KB`;
+        compressedSizeEl.textContent = `${compressedSize.toFixed(2)} KB`;
+        compressionRatioEl.textContent = `${ratio}%`;
+      }, 'image/jpeg', quality);
+    }
+  </script>
+</body>
+</html>
