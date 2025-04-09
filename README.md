@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+<head>https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-app-pub-8773480799818158
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Image Compression Tool</title>
@@ -87,8 +87,8 @@
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Image Compression Tool</h1>
+  <div class="container">ca-pub-9354903383
+    <h1>Image Compression Tool</h1>ca-pub-9055111364
     <div id="drop-zone">Click or drag an image here to upload</div>
     <input type="file" id="file-input" accept="image/*" style="display:none;" />
     <div class="slider">
