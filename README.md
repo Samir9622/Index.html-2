@@ -91,8 +91,8 @@
   </style>
 </head>
 <body>
-  <div class="container">ca-pub-9354903383
-    <h1>Image Compression Tool</h1>ca-pub-9055111364
+  <div class="container">ca-pub-5072843171
+    <h1>Image Compression Tool</h1>ca-pub-5072843171
     <div id="drop-zone">Click or drag an image here to upload</div>
     <input type="file" id="file-input" accept="image/*" style="display:none;" />
     <div class="slider">
